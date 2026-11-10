@@ -1,0 +1,860 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IDENTITY.CLOCK</title>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #060f1e;
+  --panel: #0b1b31;
+  --panel2: #102641;
+  --blue: #258bff;
+  --light: #76bdff;
+  --text: #eff7ff;
+  --muted: #829bb9;
+  --border: rgba(108,170,235,.14);
+  --green: #55e2b2;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+}
+
+body {
+  background:
+    radial-gradient(ellipse at 50% -15%, #153d6b 0%, transparent 50%),
+    var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 25px 5%;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,h2,h3,.logo,.active-name,.stat-value,.hour-name,
+.day-name,#monthYear {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.container {
+  max-width: 1150px;
+  margin: auto;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 35px;
+}
+
+.logo {
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -1px;
+}
+
+.logo span {
+  color: var(--light);
+}
+
+.live {
+  color: var(--green);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  background: var(--green);
+  border-radius: 50%;
+  box-shadow: 0 0 12px var(--green);
+}
+
+/* MAIN ACTIVE IDENTITY */
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+  padding: 65px 25px 38px;
+  background:
+    radial-gradient(ellipse at 50% 40%, rgba(34,130,255,.22), transparent 65%),
+    linear-gradient(150deg,#102d50,#09182b);
+  border: 1px solid rgba(86,163,255,.28);
+  border-radius: 25px;
+  box-shadow: 0 25px 90px rgba(0,0,0,.25);
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  width: 380px;
+  height: 380px;
+  background: rgba(34,130,255,.12);
+  filter: blur(100px);
+  border-radius: 50%;
+  top: -220px;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.eyebrow {
+  position: relative;
+  color: var(--light);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.active-name {
+  position: relative;
+  font-size: clamp(65px,12vw,125px);
+  font-weight: 700;
+  letter-spacing: -7px;
+  line-height: 1.15;
+  margin: 25px 0 12px;
+  background: linear-gradient(120deg,#fff 20%,#83c7ff 75%);
+  color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+  overflow-wrap: anywhere;
+  transition: opacity .2s;
+}
+
+.period {
+  color: #a8c8eb;
+  font-size: 13px;
+  position: relative;
+}
+
+.hero-divider {
+  height: 1px;
+  background: linear-gradient(90deg,transparent,rgba(130,190,255,.3),transparent);
+  margin: 35px auto;
+  max-width: 700px;
+}
+
+.main-stats {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  max-width: 760px;
+  margin: auto;
+  gap: 20px;
+}
+
+.main-stat {
+  min-width: 0;
+}
+
+.main-stat:not(:last-child) {
+  border-right: 1px solid var(--border);
+}
+
+.stat-label {
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  margin-bottom: 12px;
+}
+
+.stat-value {
+  font-size: clamp(19px,3vw,27px);
+  font-weight: 600;
+  letter-spacing: -.8px;
+  overflow-wrap: anywhere;
+}
+
+#countdown {
+  color: var(--light);
+  font-variant-numeric: tabular-nums;
+}
+
+.progress-area {
+  max-width: 700px;
+  margin: 38px auto 0;
+}
+
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 11px;
+  margin-bottom: 10px;
+}
+
+.progress-track {
+  height: 5px;
+  background: #203b5b;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg,#258bff,#82caff);
+  border-radius: 20px;
+  transition: width .5s linear;
+}
+
+/* NEXT IDENTITY */
+
+.next-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px 25px;
+  margin-top: 16px;
+  background: linear-gradient(110deg,#102a47,#0c1c30);
+  border: 1px solid var(--border);
+  border-radius: 17px;
+}
+
+.next-left {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.next-label {
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  font-weight: 700;
+}
+
+.next-name {
+  font-family: 'Space Grotesk',sans-serif;
+  font-size: 25px;
+  font-weight: 700;
+}
+
+.next-arrow {
+  font-size: 25px;
+  color: var(--blue);
+}
+
+/* LOWER DASHBOARD */
+
+.lower-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-top: 24px;
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 17px;
+  padding: 23px;
+  min-width: 0;
+}
+
+.panel-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 10px;
+}
+
+.panel-heading h2 {
+  font-size: 16px;
+  letter-spacing: -.5px;
+}
+
+.panel-heading span {
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.name-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.name-item {
+  padding: 12px 14px;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.name-item.active {
+  background: rgba(37,139,255,.15);
+  border-color: var(--blue);
+}
+
+.name-index {
+  color: var(--light);
+  margin-right: 12px;
+  font-size: 10px;
+}
+
+.active-tag {
+  color: var(--green);
+  font-size: 9px;
+  letter-spacing: 1px;
+  font-weight: 800;
+}
+
+/* CALENDAR */
+
+.calendar-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 17px;
+}
+
+.calendar-controls button {
+  border: 1px solid var(--border);
+  background: var(--panel2);
+  color: white;
+  border-radius: 8px;
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+  font-size: 17px;
+}
+
+.calendar-controls button:hover {
+  background: var(--blue);
+}
+
+#monthYear {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7,minmax(0,1fr));
+  gap: 5px;
+}
+
+.weekday {
+  text-align: center;
+  font-size: 9px;
+  color: var(--muted);
+  font-weight: 800;
+  padding: 8px 0;
+}
+
+.day {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  color: white;
+  min-height: 59px;
+  border-radius: 8px;
+  padding: 6px 2px;
+  cursor: pointer;
+  min-width: 0;
+}
+
+.day:hover {
+  border-color: var(--blue);
+}
+
+.day.today {
+  border-color: var(--green);
+}
+
+.day.selected {
+  background: #155da9;
+  border-color: var(--light);
+}
+
+.day.empty {
+  background: transparent;
+  border: none;
+  cursor: default;
+}
+
+.day-number {
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.day-name {
+  font-size: 8px;
+  color: var(--light);
+  margin-top: 6px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+/* SCHEDULE */
+
+.schedule-panel {
+  margin-top: 18px;
+}
+
+.schedule-grid {
+  display: grid;
+  grid-template-columns: repeat(6,minmax(0,1fr));
+  gap: 8px;
+}
+
+.hour-card {
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 11px 8px;
+  min-width: 0;
+}
+
+.hour-card.current {
+  border-color: var(--blue);
+  background: rgba(37,139,255,.15);
+}
+
+.hour-time {
+  font-size: 9px;
+  color: var(--muted);
+  margin-bottom: 7px;
+}
+
+.hour-name {
+  font-size: 12px;
+  color: var(--light);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+footer {
+  text-align: center;
+  margin: 35px 0 10px;
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: .5px;
+}
+
+@media(max-width:750px) {
+  body { padding: 20px 4%; }
+
+  .lower-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .schedule-grid {
+    grid-template-columns: repeat(3,minmax(0,1fr));
+  }
+
+  .active-name {
+    letter-spacing: -4px;
+  }
+
+  .hero {
+    padding: 50px 16px 30px;
+  }
+}
+
+@media(max-width:430px) {
+  .main-stats {
+    gap: 8px;
+  }
+
+  .stat-value {
+    font-size: 17px;
+  }
+
+  .stat-label {
+    font-size: 8px;
+  }
+
+  .schedule-grid {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+  }
+
+  .next-name {
+    font-size: 21px;
+  }
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<header>
+  <div class="logo">IDENTITY<span>.</span>CLOCK</div>
+  <div class="live"><span class="dot"></span> LIVE ROTATION</div>
+</header>
+
+<!-- MAIN ACTIVE IDENTITY -->
+
+<section class="hero">
+
+  <div class="eyebrow">CURRENT IDENTITY</div>
+
+  <div class="active-name" id="activeName">Rayyan</div>
+
+  <div class="period" id="period">Loading...</div>
+
+  <div class="hero-divider"></div>
+
+  <div class="main-stats">
+
+    <div class="main-stat">
+      <div class="stat-label">Current time</div>
+      <div class="stat-value" id="clock">--:--:--</div>
+    </div>
+
+    <div class="main-stat">
+      <div class="stat-label">Next name in</div>
+      <div class="stat-value" id="countdown">--:--:--</div>
+    </div>
+
+    <div class="main-stat">
+      <div class="stat-label">Hourly progress</div>
+      <div class="stat-value" id="percentage">0%</div>
+    </div>
+
+  </div>
+
+  <div class="progress-area">
+    <div class="progress-label">
+      <span>TIME UNTIL NEXT IDENTITY</span>
+      <span id="progressText">0%</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progress"></div>
+    </div>
+  </div>
+
+</section>
+
+<!-- NEXT IDENTITY -->
+
+<section class="next-card">
+  <div class="next-left">
+    <div class="next-label">UP NEXT</div>
+    <div class="next-name" id="nextName">Hrimaan</div>
+  </div>
+  <div class="next-arrow">→</div>
+</section>
+
+<!-- SECONDARY INFORMATION -->
+
+<div class="lower-grid">
+
+  <section class="panel">
+    <div class="panel-heading">
+      <h2>Name rotation</h2>
+      <span>5 IDENTITIES</span>
+    </div>
+    <div class="name-list" id="nameList"></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-heading">
+      <h2>Calendar</h2>
+      <span>DAILY ROTATION</span>
+    </div>
+
+    <div class="calendar-controls">
+      <button id="prev">‹</button>
+      <div id="monthYear"></div>
+      <button id="next">›</button>
+    </div>
+
+    <div class="calendar-grid" id="calendar"></div>
+  </section>
+
+</div>
+
+<!-- SCHEDULE -->
+
+<section class="panel schedule-panel">
+  <div class="panel-heading">
+    <h2>24-hour schedule</h2>
+    <span id="scheduleDate"></span>
+  </div>
+  <div class="schedule-grid" id="schedule"></div>
+</section>
+
+<footer>
+  IDENTITY.CLOCK · A fictional hourly name rotation
+</footer>
+
+</div>
+
+<script>
+$(function() {
+
+  const names = [
+    "Ranveer",
+    "Hrimaan",
+    "Ram",
+    "Rayyan",
+    "Ayaan"
+  ];
+
+  // Reference: November 9, 2026, 10 AM = Rayyan.
+  const referenceDate = new Date(2026,10,9);
+  const referenceIndex = 3;
+  const anchor = new Date(2026,10,9,10,0,0);
+
+  let calendarDate = new Date();
+  let selectedDate = new Date();
+
+  function mod(n,m) {
+    return ((n%m)+m)%m;
+  }
+
+  function dayNumber(d) {
+    return Math.floor(Date.UTC(
+      d.getFullYear(),d.getMonth(),d.getDate()
+    )/86400000);
+  }
+
+  function sameDay(a,b) {
+    return a.toDateString() === b.toDateString();
+  }
+
+  // Calendar: daily +2 rotation.
+  function getDailyName(date) {
+    const days = dayNumber(date)-dayNumber(referenceDate);
+    return names[mod(referenceIndex+days*2,names.length)];
+  }
+
+  // Hourly schedule: +1 each hour, +1 extra at midnight.
+  function getHourlyName(date,hour) {
+    const target = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      hour
+    );
+
+    const elapsed = Math.round(
+      (target.getTime()-anchor.getTime())/3600000
+    );
+
+    const midnightSteps =
+      dayNumber(target)-dayNumber(anchor);
+
+    return names[mod(
+      referenceIndex+elapsed+midnightSteps,
+      names.length
+    )];
+  }
+
+  function formatHour(hour) {
+    const suffix = hour>=12 ? "PM":"AM";
+    return `${hour%12||12}:00 ${suffix}`;
+  }
+
+  function updateClock() {
+    const now = new Date();
+    const hour = now.getHours();
+
+    const current = getHourlyName(now,hour);
+
+    const nextHour = new Date(now);
+    nextHour.setHours(hour+1,0,0,0);
+
+    const remaining = nextHour-now;
+
+    const h = Math.floor(remaining/3600000);
+    const m = Math.floor((remaining%3600000)/60000);
+    const s = Math.floor((remaining%60000)/1000);
+
+    const elapsed = now.getMinutes()*60+now.getSeconds();
+    const percent = elapsed/3600*100;
+
+    $("#activeName").text(current);
+
+    $("#clock").text(
+      now.toLocaleTimeString("en-US")
+    );
+
+    $("#period").text(
+      `${formatHour(hour)} – ${hour%12||12}:59 ${
+        hour>=12?"PM":"AM"
+      } · ${now.toLocaleDateString("en-US",{
+        weekday:"long",month:"long",day:"numeric",year:"numeric"
+      })}`
+    );
+
+    $("#countdown").text(
+      [h,m,s].map(x=>String(x).padStart(2,"0")).join(":")
+    );
+
+    $("#percentage").text(percent.toFixed(1)+"%");
+    $("#progressText").text(percent.toFixed(1)+"%");
+    $("#progress").css("width",percent+"%");
+
+    const nextDate = new Date(nextHour);
+
+    $("#nextName").text(
+      getHourlyName(nextDate,nextDate.getHours())
+    );
+
+    renderNameList(current);
+  }
+
+  function renderNameList(current) {
+    let html = "";
+
+    names.forEach((name,i)=>{
+      const active = name===current;
+
+      html += `
+        <div class="name-item ${active?"active":""}">
+          <div>
+            <span class="name-index">
+              ${String(i+1).padStart(2,"0")}
+            </span>
+            ${name}
+          </div>
+          ${active?'<span class="active-tag">ACTIVE</span>':''}
+        </div>
+      `;
+    });
+
+    $("#nameList").html(html);
+  }
+
+  function renderCalendar() {
+    const year = calendarDate.getFullYear();
+    const month = calendarDate.getMonth();
+
+    $("#monthYear").text(
+      calendarDate.toLocaleDateString("en-US",{
+        month:"long",year:"numeric"
+      })
+    );
+
+    const first = new Date(year,month,1).getDay();
+    const total = new Date(year,month+1,0).getDate();
+
+    const weekdays = ["SUN","MON","TUE","WED","THU","FRI","SAT"];
+
+    let html = weekdays.map(d=>
+      `<div class="weekday">${d}</div>`
+    ).join("");
+
+    for(let i=0;i<first;i++) {
+      html += '<div class="day empty"></div>';
+    }
+
+    const today = new Date();
+
+    for(let d=1;d<=total;d++) {
+      const date = new Date(year,month,d);
+
+      html += `
+        <button class="day
+          ${sameDay(date,today)?"today":""}
+          ${sameDay(date,selectedDate)?"selected":""}"
+          data-day="${d}">
+          <div class="day-number">${d}</div>
+          <div class="day-name">${getDailyName(date)}</div>
+        </button>
+      `;
+    }
+
+    $("#calendar").html(html);
+  }
+
+  function renderSchedule() {
+    const now = new Date();
+    let html = "";
+
+    $("#scheduleDate").text(
+      selectedDate.toLocaleDateString("en-US",{
+        month:"short",day:"numeric",year:"numeric"
+      })
+    );
+
+    for(let hour=0;hour<24;hour++) {
+      const current =
+        sameDay(selectedDate,now)&&hour===now.getHours();
+
+      const name = getHourlyName(selectedDate,hour);
+
+      const suffix = hour>=12?"PM":"AM";
+      const h = hour%12||12;
+
+      html += `
+        <div class="hour-card ${current?"current":""}">
+          <div class="hour-time">${h}:00 ${suffix}</div>
+          <div class="hour-name">${name}</div>
+        </div>
+      `;
+    }
+
+    $("#schedule").html(html);
+  }
+
+  function refresh() {
+    updateClock();
+    renderCalendar();
+    renderSchedule();
+  }
+
+  $("#prev").click(function() {
+    calendarDate.setMonth(calendarDate.getMonth()-1);
+    renderCalendar();
+  });
+
+  $("#next").click(function() {
+    calendarDate.setMonth(calendarDate.getMonth()+1);
+    renderCalendar();
+  });
+
+  $("#calendar").on("click",".day:not(.empty)",function() {
+    selectedDate = new Date(
+      calendarDate.getFullYear(),
+      calendarDate.getMonth(),
+      Number($(this).data("day"))
+    );
+
+    renderCalendar();
+    renderSchedule();
+  });
+
+  refresh();
+
+  setInterval(updateClock,1000);
+
+  setInterval(function() {
+    if(sameDay(selectedDate,new Date())) {
+      renderSchedule();
+    }
+  },60000);
+
+});
+</script>
+</body>
+</html>
